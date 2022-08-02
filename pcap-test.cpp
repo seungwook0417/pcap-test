@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <libnet.h> // libnet
+
 #define ETHER_ADDR_LEN	6
 #define IP_ADDR_LEN 4
 
@@ -100,19 +101,16 @@ int main(int argc, char* argv[]) {
 		struct libnet_ethernet_hdr* eth_hdr = (struct libnet_ethernet_hdr*)packet;
 		struct libnet_ipv4_hdr* ip_hdr = (struct libnet_ipv4_hdr*)(packet + 14); // ethernet 14bytes
 		// IP 헤더의 IHL의 하위 4비트 * 4 만큼 더해준다.
-		// TCP 헤더 set
 		struct libnet_tcp_hdr* tcp_hdr = (struct libnet_tcp_hdr*)(packet + 14 + (ip_hdr->ip_hl) * 4);
 
-
 		if((ip_hdr->ip_p) != 0x6) // ip_p (protocol) : TCP = 6
-        	continue;
+            continue;
 		if(ntohs(eth_hdr->ether_type) != 0x0800) // ether_type : 0x0800 = ip
             continue;
-	
+
 		print_Ethernet_Header(eth_hdr);
 		print_IP_Header(ip_hdr);
 		print_TCP_Header(tcp_hdr);
-		// 페이로드의 오프셋
 		// TCP 헤더의 data_offset의 상위 4비트 * 4 만큼 더해준다.
 		uint32_t offset = 14 + (ip_hdr->ip_hl) * 4 + (tcp_hdr->th_off) * 4; // packet to data start offset
         print_payload(packet, offset);
