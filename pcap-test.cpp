@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <libnet.h> // libnet
-
+//박병제 왔따감.
 #define ETHER_ADDR_LEN	6
 #define IP_ADDR_LEN 4
 
