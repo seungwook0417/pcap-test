@@ -58,11 +58,13 @@ void print_IP_Header(struct libnet_ipv4_hdr* ip_hdr){
 	// 네트워크 바이트 정렬 방식의 4바이트 데이터를 호스트 바이트 정렬 방식으로 변환
 	// 예 : 0x0a0b0c0d -> 0x0c0b0a0d
     u_int32_t src = ntohl(ip_hdr->ip_src.s_addr);
-    u_int32_t dst = ntohl(ip_hdr->ip_dst.s_addr);
+    u_int32_t dst = ntohl(ip_hdr->ip_dst.s_addr); 
 
 	printf("src ip : ");
 	// 출력 예 : 00c0b0a0dx
 	// 바이트를 IP주소로 변환하여 출력
+	// printf("%d.%d.%d.%d\n", (src >> 24) & 0xff, (src >> 16) & 0xff, (src >> 8) & 0xff, src & 0xff);
+
 	printf("%d.%d.%d.%d\n",src>>24, (u_char)(src>>16),(u_char)(src>>8),(u_char)(src)); /* source ip address */
 	printf("dst ip : ");
 	printf("%d.%d.%d.%d\n",dst>>24, (u_char)(dst>>16),(u_char)(dst>>8),(u_char)(dst)); /* destination ip address */
@@ -101,7 +103,7 @@ void print_payload(const u_char* packet, u_int offset){
 	// 최대 10바이트만 출력
 	for(uint8_t i = 0; i < 10; i++){
 		// 패킷의 offset을 이용해서 패킷의 크기만큼 출력
-		// printf("%02x ", packet[offset+i]);
+		// printf("%02x | ", packet[offset+i]);
         printf("%02x | ", *(packet + offset + i));
     }
     printf("\n");
