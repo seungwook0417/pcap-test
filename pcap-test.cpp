@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <libnet.h> // libnet
+
 //박병제 왔따감.
 #define ETHER_ADDR_LEN	6
 #define IP_ADDR_LEN 4
+#define min(x, y) (x) < (y) ? (x) : (y)
 
 /* 
 	gilgil random 대비 주석처리
@@ -96,16 +98,26 @@ void print_TCP_Header(struct libnet_tcp_hdr* tcp_hdr){
 
 // Payload(Data)의 hexadecimal value(최대 10바이트까지만)를 출력하는 함수
 // 맞는지 모르겠음.
-void print_payload(const u_char* packet, u_int offset){
+void print_payload(const u_char* packet, u_int offset, u_int total_len){
 	printf("\nPayload data\n");
 
 	printf("data: ");
-	// 최대 10바이트만 출력
-	for(uint8_t i = 0; i < 10; i++){
+
+	if (total_len < offset ){
+		printf("no DATA\n");
+	}
+	else{
+		// 최대 10바이트만 출력
+		u_int cnt = total_len - offset;
+		int len = min(cnt, 10);
+		for(uint8_t i = 0; i < len; i++){
 		// 패킷의 offset을 이용해서 패킷의 크기만큼 출력
 		// printf("%02x | ", packet[offset+i]);
-        printf("%02x | ", *(packet + offset + i));
+        	printf("%02x | ", *(packet + offset + i));
     }
+
+	}
+	
     printf("\n");
 };
 
@@ -151,6 +163,7 @@ int main(int argc, char* argv[]) {
 			printf("pcap_next_ex return %d(%s)\n", res, pcap_geterr(pcap));
 			break;
 		}
+		// printf("%u bytes captured\n", header->caplen);
 
 		/*
 		*  Ethernet II header
@@ -173,15 +186,17 @@ int main(int argc, char* argv[]) {
 		// IHL = 헤더길이 / 4 입니다. 헤더길이 = ihl * 4
 		struct libnet_tcp_hdr* tcp_hdr = (struct libnet_tcp_hdr*)(packet + 14 + (ip_hdr->ip_hl) * 4);
 
-		// TCP 가 아닐 경우 다음 으로 이동합니다.
-		// if (ip_hdr->ip_p != IPPROTO_TCP) continue;
-		if((ip_hdr->ip_p) != 0x6) // ip_p (protocol) : TCP = 6
-            continue;
 		// IP 가 아닐 경우 다음 으로 이동합니다.
 		// if (tcp_hdr->th_sport != htons(80)) continue;
 		if(ntohs(eth_hdr->ether_type) != 0x0800) // ether_type : 0x0800 = ip
             continue;
+			
+		// TCP 가 아닐 경우 다음 으로 이동합니다.
+		// if (ip_hdr->ip_p != IPPROTO_TCP) continue;
+		if((ip_hdr->ip_p) != 0x6) // ip_p (protocol) : TCP = 6
+            continue;
 
+		printf("----------------------------------------------------\n");
 		// 과제에서 요청하는 패킷을 출력합니다.
 		// Ethernet Header의 src mac / dst mac 출력
 		print_Ethernet_Header(eth_hdr);
@@ -192,7 +207,8 @@ int main(int argc, char* argv[]) {
 		// data_offset = 헤더길이 / 4 입니다. 헤더길이 = data_offset * 4
 		uint32_t offset = 14 + (ip_hdr->ip_hl) * 4 + (tcp_hdr->th_off) * 4; // packet to data start offset
 		// payload 출력
-        print_payload(packet, offset);
+        print_payload(packet, offset, header->caplen);
+		printf("----------------------------------------------------\n");
 
 	}
 
