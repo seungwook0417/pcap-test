@@ -103,7 +103,7 @@ void print_payload(const u_char* packet, u_int offset, u_int total_len){
 
 	printf("data: ");
 
-	if (total_len < offset ){
+	if (total_len <= offset ){
 		printf("no DATA\n");
 	}
 	else{
