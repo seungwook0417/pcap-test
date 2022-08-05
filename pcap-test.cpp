@@ -27,7 +27,6 @@ void print_Ethernet_Header(struct libnet_ethernet_hdr* eth_hdr){
 	printf("src MAC : ");
     for(int i = 0; i < ETHER_ADDR_LEN ; i++){
 		// 2자리씩 출력(16진수)
-		// 출력 예 : 00:00:00:00:00:00
         printf("%02x : ", eth_hdr->ether_shost[i]); /* source ethernet address */
     }
     printf("\n");
@@ -58,12 +57,10 @@ void print_IP_Header(struct libnet_ipv4_hdr* ip_hdr){
 	// The <netinet/in.h> header shall define the in_addr structure that includes at least the following member:
 	// in_addr_t  s_addr; /* address in network byte order */
 	// 네트워크 바이트 정렬 방식의 4바이트 데이터를 호스트 바이트 정렬 방식으로 변환
-	// 예 : 0x0a0b0c0d -> 0x0c0b0a0d
     u_int32_t src = ntohl(ip_hdr->ip_src.s_addr);
     u_int32_t dst = ntohl(ip_hdr->ip_dst.s_addr); 
 
 	printf("src ip : ");
-	// 출력 예 : 00c0b0a0dx
 	// 바이트를 IP주소로 변환하여 출력
 	// printf("%d.%d.%d.%d\n", (src >> 24) & 0xff, (src >> 16) & 0xff, (src >> 8) & 0xff, src & 0xff);
 
